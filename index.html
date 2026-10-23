@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#173f35">
+  <title>Ақылды кітапхана — Умная библиотека</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#" aria-label="Ақылды кітапхана">
+        <span class="brand-mark">кі</span>
+        <span><strong>Ақылды кітапхана</strong><small>SMART LIBRARY</small></span>
+      </a>
+      <div class="side-label" data-i18n="menu">МӘЗІР / МЕНЮ</div>
+      <nav class="nav">
+        <button class="nav-item active" data-page="home"><span>⌂</span><span data-i18n="navHome">Басты бет</span></button>
+        <button class="nav-item" data-page="catalog"><span>▤</span><span data-i18n="navCatalog">Кітаптар каталогы</span></button>
+        <button class="nav-item" data-page="favorites"><span>♡</span><span data-i18n="navFavorites">Таңдаулылар</span><b id="favCount" class="nav-count">0</b></button>
+        <button class="nav-item" data-page="assistant"><span>✧</span><span data-i18n="navAI">ЖИ кітап көмекшісі</span></button>
+        <button class="nav-item" data-page="admin"><span>▦</span><span data-i18n="navAdmin">Кітапханашы панелі</span></button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="mini-card"><span class="mini-icon">✦</span><div><strong data-i18n="readingTip">Оқуға шабыт</strong><p data-i18n="tipText">Күніне 15 минут оқу — жаңа әлемге жол.</p></div></div>
+        <button class="language-switch" id="languageBtn">ҚАЗ / РУС <span>↗</span></button>
+        <div class="profile-mini"><div class="avatar" id="sideAvatar">О</div><div><strong id="sideUser">Оқырман</strong><small data-i18n="readerRole">Оқырман</small></div><button id="openAuth" class="icon-button" aria-label="Профиль">↗</button></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="mobile-brand"><span class="brand-mark">кі</span><strong>Ақылды кітапхана</strong></div>
+        <div class="breadcrumb"><span data-i18n="breadcrumb">Кітапхана</span><span class="crumb-dot">/</span><strong id="pageTitle" data-i18n="navHome">Басты бет</strong></div>
+        <div class="top-actions">
+          <span class="open-pill"><i></i><span data-i18n="demoMode">Демо-нұсқа</span></span>
+          <button class="user-button" id="topAuth"><span class="avatar small" id="topAvatar">О</span><span id="topUser">Оқырман</span><span>⌄</span></button>
+        </div>
+      </header>
+
+      <section id="homePage" class="page active">
+        <div class="hero">
+          <div class="hero-copy">
+            <div class="eyebrow"><span>✦</span><span data-i18n="heroEyebrow">СІЗДІҢ КЕЛЕСІ СҮЙІКТІ КІТАБЫҢЫЗ ОСЫНДА</span></div>
+            <h1 data-i18n="heroTitle">Әр кітап —<br><em>жаңа әлем.</em></h1>
+            <p data-i18n="heroText">Өзіңізге жақын оқиғаларды табыңыз. Ақылды іздеу мен жеке ұсыныстар оқу әлемін одан әрі қызықты етеді.</p>
+            <button class="button button-light" data-goto="catalog"><span data-i18n="exploreBooks">Кітаптарды қарау</span><span>↗</span></button>
+          </div>
+          <div class="hero-art" aria-hidden="true">
+            <div class="sun"></div><div class="art-book book-one"><span>ОЙЛАР</span><b>ӨЗІҢДІ<br>ТАНЫ</b><small>01 / KNOW YOURSELF</small></div>
+            <div class="art-book book-two"><span>ӘДЕБИЕТ</span><b>ЖАҢА<br>БЕТТЕР</b><small>02 / NEW STORIES</small></div>
+            <div class="art-book book-three"><span>БІЛІМ</span><b>БІЛІМ —<br>ҚАЗЫНА</b><small>03 / KNOWLEDGE</small></div>
+            <div class="spark spark-a">✳</div><div class="spark spark-b">✦</div>
+          </div>
+          <div class="hero-bottom"><span data-i18n="heroNote">ОҚЫ. ІЗДЕ. ШАБЫТТАН.</span><span>01 — 04</span></div>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat"><span class="stat-icon">▤</span><div><strong id="totalBooks">8</strong><small data-i18n="booksInCatalog">Каталогтағы кітап</small></div></div>
+          <div class="stat"><span class="stat-icon">♧</span><div><strong id="availableBooks">6</strong><small data-i18n="available">Қолжетімді</small></div></div>
+          <div class="stat"><span class="stat-icon">✧</span><div><strong>AI</strong><small data-i18n="smartSuggestions">Ақылды ұсыныстар</small></div></div>
+          <div class="stat"><span class="stat-icon">♡</span><div><strong id="favoriteStat">0</strong><small data-i18n="yourFavorites">Сіздің таңдаулыларыңыз</small></div></div>
+        </div>
+
+        <section class="content-section">
+          <div class="section-heading"><div><div class="eyebrow dark-eyebrow" data-i18n="curated">АРНАЙЫ СІЗ ҮШІН</div><h2 data-i18n="popularTitle">Оқырмандар таңдауы</h2></div><button class="text-link" data-goto="catalog"><span data-i18n="allBooks">Барлық кітаптар</span> ↗</button></div>
+          <div class="book-grid" id="featuredBooks"></div>
+        </section>
+        <section class="recommend-banner">
+          <div class="recommend-symbol">✧</div><div><div class="eyebrow" data-i18n="aiEyebrow">ЖАСАНДЫ ИНТЕЛЛЕКТ КӨМЕГІМЕН</div><h3 data-i18n="bannerTitle">Келесі оқитын кітабыңызды табыңыз</h3><p data-i18n="bannerText">Қызығушылықтарыңызды таңдаңыз — біз сізге лайық кітаптарды ұсынамыз.</p></div><button class="button button-green" data-goto="assistant"><span data-i18n="getRecommendation">Ұсыныс алу</span><span>↗</span></button>
+        </section>
+      </section>
+
+      <section id="catalogPage" class="page">
+        <div class="page-intro"><div class="eyebrow dark-eyebrow" data-i18n="libraryCollection">КІТАПХАНА ҚОРЫ</div><h1 data-i18n="catalogHeading">Кітаптар каталогы</h1><p data-i18n="catalogSub">Өзіңізге қажет кітапты атауы, авторы немесе жанры бойынша табыңыз.</p></div>
+        <div class="search-panel"><div class="search-box"><span>⌕</span><input id="searchInput" type="search" data-placeholder="searchPlaceholder" placeholder="Кітап немесе авторды іздеу..."><kbd>⌘ K</kbd></div><select id="genreFilter" aria-label="Жанр"><option value="all" data-i18n="allGenres">Барлық жанр</option><option value="Әдебиет">Әдебиет</option><option value="Психология">Психология</option><option value="Ғылым">Ғылым</option><option value="Фантастика">Фантастика</option><option value="Тарих">Тарих</option><option value="Өзін-өзі дамыту">Өзін-өзі дамыту</option></select><select id="availabilityFilter" aria-label="Қолжетімділік"><option value="all" data-i18n="allAvailability">Барлығы</option><option value="yes" data-i18n="inStock">Қолжетімді</option><option value="no" data-i18n="outOfStock">Қолда жоқ</option></select></div>
+        <div class="catalog-meta"><span id="resultCount">8 кітап</span><span data-i18n="catalogHint">Барлық кітаптар — демо деректер</span></div>
+        <div class="book-grid" id="catalogBooks"></div>
+      </section>
+
+      <section id="favoritesPage" class="page">
+        <div class="page-intro"><div class="eyebrow dark-eyebrow" data-i18n="yourCollection">ЖЕКЕ ЖИНАҒЫҢЫЗ</div><h1 data-i18n="favoritesHeading">Таңдаулы кітаптар</h1><p data-i18n="favoritesSub">Кейін оқығыңыз келетін кітаптарды осы жерге сақтаңыз.</p></div>
+        <div class="book-grid" id="favoriteBooks"></div>
+        <div id="emptyFavorites" class="empty-state"><span>♡</span><h3 data-i18n="emptyFavTitle">Әзірге таңдаулы кітап жоқ</h3><p data-i18n="emptyFavText">Каталогтан жүрек белгісін басып, ұнаған кітаптарыңызды сақтаңыз.</p><button class="button button-green" data-goto="catalog" data-i18n="openCatalog">Каталогты ашу</button></div>
+      </section>
+
+      <section id="assistantPage" class="page">
+        <div class="page-intro"><div class="eyebrow dark-eyebrow">✧ SMART READER</div><h1 data-i18n="assistantHeading">ЖИ кітап көмекшісі</h1><p data-i18n="assistantSub">Қызығушылығыңызды айтыңыз — сізге сәйкес кітаптарды таңдауға көмектесеміз.</p></div>
+        <div class="assistant-layout">
+          <div class="assistant-card"><div class="assistant-card-head"><div class="assistant-avatar">✧</div><div><strong data-i18n="aiHelper">Ақылды көмекші</strong><small><i></i><span data-i18n="readyToHelp">Ұсыныс беруге дайын</span></small></div><span class="demo-tag">DEMO AI</span></div>
+            <label class="field-label" data-i18n="chooseGenres">Қандай жанрлар ұнайды?</label>
+            <div class="genre-chips" id="interestChips"><button class="chip selected" data-genre="Психология" data-i18n="genrePsych">Психология</button><button class="chip" data-genre="Фантастика" data-i18n="genreFantasy">Фантастика</button><button class="chip" data-genre="Әдебиет" data-i18n="genreLiterature">Әдебиет</button><button class="chip" data-genre="Ғылым" data-i18n="genreScience">Ғылым</button><button class="chip" data-genre="Тарих" data-i18n="genreHistory">Тарих</button><button class="chip" data-genre="Өзін-өзі дамыту" data-i18n="genreGrowth">Өзін-өзі дамыту</button></div>
+            <label class="field-label" for="goalInput" data-i18n="readingGoal">Не үшін кітап іздеп жүрсіз?</label><textarea id="goalInput" rows="3" data-placeholder="goalPlaceholder" placeholder="Мысалы: өзімді дамытуға, шабыт алуға немесе жаңа нәрсе үйренуге..."></textarea>
+            <button id="recommendBtn" class="button button-green full-button"><span data-i18n="recommendBtn">Маған кітап ұсын</span><span>✧</span></button>
+            <p class="disclaimer" data-i18n="demoDisclaimer">Бұл — демонстрациялық ұсыныс жүйесі. Нәтиже кітап жанры мен сипаттамасына қарай таңдалады; сыртқы ИИ API қосылмаған.</p>
+          </div>
+          <div class="recommend-results"><div class="result-heading"><span class="result-star">✧</span><div><h3 data-i18n="yourRecommendations">Сізге ұсынылады</h3><p data-i18n="recommendHint">Жанр таңдаңыз да, ұсыныс алыңыз.</p></div></div><div id="recommendationList" class="recommendation-list"><div class="placeholder-result"><span>✧</span><p data-i18n="recommendPlaceholder">Сіздің келесі сүйікті кітабыңыз осында пайда болады.</p></div></div></div>
+        </div>
+      </section>
+
+      <section id="adminPage" class="page">
+        <div class="page-intro admin-intro"><div><div class="eyebrow dark-eyebrow" data-i18n="staffSpace">ҚЫЗМЕТКЕРЛЕРГЕ АРНАЛҒАН</div><h1 data-i18n="adminHeading">Кітапханашы панелі</h1><p data-i18n="adminSub">Кітапхана қорын басқарыңыз және жаңа кітаптарды каталогқа қосыңыз.</p></div><span class="admin-badge">DEMO MODE</span></div>
+        <div class="admin-metrics"><div><small data-i18n="allBooksMetric">Барлық кітап</small><strong id="adminTotal">8</strong></div><div><small data-i18n="availableMetric">Қолжетімді</small><strong id="adminAvailable">6</strong></div><div><small data-i18n="favoritesMetric">Таңдаулыларда</small><strong id="adminFavs">0</strong></div></div>
+        <div class="admin-layout"><form id="bookForm" class="form-card"><div class="form-card-title"><span class="form-icon">＋</span><div><h3 data-i18n="addBook">Жаңа кітап қосу</h3><p data-i18n="addBookSub">Міндетті ақпаратты толтырыңыз.</p></div></div>
+          <label class="field-label" for="bookTitle" data-i18n="bookName">Кітап атауы</label><input id="bookTitle" required maxlength="100" placeholder="Мысалы: Абай жолы">
+          <label class="field-label" for="bookAuthor" data-i18n="author">Автор</label><input id="bookAuthor" required maxlength="80" placeholder="Автордың аты-жөні">
+          <label class="field-label" for="bookGenre" data-i18n="genre">Жанр</label><select id="bookGenre"><option>Әдебиет</option><option>Психология</option><option>Ғылым</option><option>Фантастика</option><option>Тарих</option><option>Өзін-өзі дамыту</option></select>
+          <label class="field-label" for="bookDescription" data-i18n="description">Қысқаша сипаттама</label><textarea id="bookDescription" rows="3" maxlength="350" placeholder="Кітап туралы қысқаша..."></textarea>
+          <div class="form-row"><div><label class="field-label" for="bookShelf" data-i18n="shelf">Сөре</label><input id="bookShelf" placeholder="A-02"></div><div><label class="field-label" for="bookCopies" data-i18n="copies">Дана саны</label><input id="bookCopies" type="number" min="0" max="999" value="1" required></div></div>
+          <button class="button button-green full-button" type="submit"><span data-i18n="saveBook">Кітапты сақтау</span><span>＋</span></button><p class="disclaimer" data-i18n="adminDemoNote">Демо нұсқада өзгерістер осы браузерде сақталады.</p>
+        </form>
+        <div class="inventory-card"><div class="inventory-head"><div><h3 data-i18n="inventory">Кітап қоры</h3><p data-i18n="inventorySub">Каталогтағы соңғы жазбалар</p></div><span id="inventoryCount" class="count-badge">8</span></div><div id="inventoryList" class="inventory-list"></div></div></div>
+      </section>
+
+      <footer class="footer"><span>© 2026 Ақылды кітапхана</span><span data-i18n="footerText">Оқуға жақынырақ болыңыз.</span><span>MADE FOR READERS ✦</span></footer>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="authModal" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="authTitle"><button class="modal-close" id="closeAuth" aria-label="Жабу">×</button><div class="modal-logo">кі</div><div class="eyebrow dark-eyebrow" data-i18n="readerAccount">ОҚЫРМАН АККАУНТЫ</div><h2 id="authTitle" data-i18n="welcome">Қош келдіңіз!</h2><p data-i18n="authSub">Профиль жасап, таңдаулы кітаптарыңызды сақтаңыз.</p><form id="authForm"><label class="field-label" for="readerName" data-i18n="yourName">Есіміңіз</label><input id="readerName" required maxlength="40" placeholder="Есіміңізді енгізіңіз"><label class="field-label" for="readerEmail" data-i18n="email">Электрондық пошта (міндетті емес)</label><input id="readerEmail" type="email" placeholder="you@example.com"><button class="button button-green full-button" type="submit" data-i18n="createProfile">Профиль жасау</button></form><p class="disclaimer" data-i18n="localAccountNote">Демо профиль осы құрылғыда ғана сақталады. Бұл нақты серверлік тіркеу емес.</p></div></div>
+  <div id="toast" class="toast" role="status"></div>
+  <script src="app.js"></script>
+</body>
+</html>
