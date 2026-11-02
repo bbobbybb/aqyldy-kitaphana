@@ -8,6 +8,50 @@ const initialBooks = [
  {id:7,title:"Ғарыш туралы қысқаша тарих",author:"Стивен Хокинг",genre:"Ғылым",description:"Ғаламның пайда болуы, қара құрдымдар және уақыт туралы күрделі ғылыми сұрақтарды көпшілікке түсінікті тілмен таныстырады.",shelf:"C-03",copies:4,cover:7},
  {id:8,title:"Өзіңе сен",author:"Шэрон Мартин",genre:"Өзін-өзі дамыту",description:"Өзін түсіну, жеке шекараны сақтау және сенімді қарым-қатынас қалыптастыру туралы пайдалы ойлар мен жаттығулар.",shelf:"B-01",copies:1,cover:8}
 ];
+const SUPABASE_URL = "https://gkajzcrwdvsbqglmptxz.supabase.co";
+const SUPABASE_KEY = "sb_publishable_ned8YFOqxfPgZbKfqhPF5w_NmvFrSKq";
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+let currentUser = null;
+let isLibrarian = false;
+
+async function refreshAuthState() {
+    const { data, error } = await supabaseClient.auth.getSession();
+
+    if (error) {
+        console.error("Ошибка проверки входа:", error.message);
+        return;
+    }
+
+    currentUser = data.session?.user || null;
+    isLibrarian = false;
+
+    if (currentUser) {
+        const { data: userProfile, error: profileError } =
+            await supabaseClient
+                .from("profiles")
+                .select("role")
+                .eq("id", currentUser.id)
+                .maybeSingle();
+
+        if (profileError) {
+            console.error("Ошибка проверки роли:", profileError.message);
+        } else {
+            isLibrarian = userProfile?.role === "librarian";
+        }
+    }
+
+    const adminButton = document.querySelector(
+        '.nav-item[data-page="admin"]'
+    );
+
+    if (adminButton) {
+        adminButton.hidden = !isLibrarian;
+    }
+}
 const translations = {
  kk:{
   menu:"МӘЗІР / МЕНЮ",navHome:"Басты бет",navCatalog:"Кітаптар каталогы",navFavorites:"Таңдаулылар",navAI:"ЖИ кітап көмекшісі",navAdmin:"Кітапханашы панелі",readingTip:"Оқуға шабыт",tipText:"Күніне 15 минут оқу — жаңа әлемге жол.",readerRole:"Оқырман",breadcrumb:"Кітапхана",demoMode:"Демо-нұсқа",heroEyebrow:"СІЗДІҢ КЕЛЕСІ СҮЙІКТІ КІТАБЫҢЫЗ ОСЫНДА",heroTitle:"Әр кітап —<br><em>жаңа әлем.</em>",heroText:"Өзіңізге жақын оқиғаларды табыңыз. Ақылды іздеу мен жеке ұсыныстар оқу әлемін одан әрі қызықты етеді.",exploreBooks:"Кітаптарды қарау",heroNote:"ОҚЫ. ІЗДЕ. ШАБЫТТАН.",booksInCatalog:"Каталогтағы кітап",available:"Қолжетімді",smartSuggestions:"Ақылды ұсыныстар",yourFavorites:"Сіздің таңдаулыларыңыз",curated:"АРНАЙЫ СІЗ ҮШІН",popularTitle:"Оқырмандар таңдауы",allBooks:"Барлық кітаптар",aiEyebrow:"ЖАСАНДЫ ИНТЕЛЛЕКТ КӨМЕГІМЕН",bannerTitle:"Келесі оқитын кітабыңызды табыңыз",bannerText:"Қызығушылықтарыңызды таңдаңыз — біз сізге лайық кітаптарды ұсынамыз.",getRecommendation:"Ұсыныс алу",libraryCollection:"КІТАПХАНА ҚОРЫ",catalogHeading:"Кітаптар каталогы",catalogSub:"Өзіңізге қажет кітапты атауы, авторы немесе жанры бойынша табыңыз.",searchPlaceholder:"Кітап немесе авторды іздеу...",allGenres:"Барлық жанр",allAvailability:"Барлығы",inStock:"Қолжетімді",outOfStock:"Қолда жоқ",catalogHint:"Барлық кітаптар — демо деректер",yourCollection:"ЖЕКЕ ЖИНАҒЫҢЫЗ",favoritesHeading:"Таңдаулы кітаптар",favoritesSub:"Кейін оқығыңыз келетін кітаптарды осы жерге сақтаңыз.",emptyFavTitle:"Әзірге таңдаулы кітап жоқ",emptyFavText:"Каталогтан жүрек белгісін басып, ұнаған кітаптарыңызды сақтаңыз.",openCatalog:"Каталогты ашу",assistantHeading:"ЖИ кітап көмекшісі",assistantSub:"Қызығушылығыңызды айтыңыз — сізге сәйкес кітаптарды таңдауға көмектесеміз.",aiHelper:"Ақылды көмекші",readyToHelp:"Ұсыныс беруге дайын",chooseGenres:"Қандай жанрлар ұнайды?",genrePsych:"Психология",genreFantasy:"Фантастика",genreLiterature:"Әдебиет",genreScience:"Ғылым",genreHistory:"Тарих",genreGrowth:"Өзін-өзі дамыту",readingGoal:"Не үшін кітап іздеп жүрсіз?",goalPlaceholder:"Мысалы: өзімді дамытуға, шабыт алуға немесе жаңа нәрсе үйренуге...",recommendBtn:"Маған кітап ұсын",demoDisclaimer:"Бұл — демонстрациялық ұсыныс жүйесі. Нәтиже кітап жанры мен сипаттамасына қарай таңдалады; сыртқы ИИ API қосылмаған.",yourRecommendations:"Сізге ұсынылады",recommendHint:"Жанр таңдаңыз да, ұсыныс алыңыз.",recommendPlaceholder:"Сіздің келесі сүйікті кітабыңыз осында пайда болады.",staffSpace:"ҚЫЗМЕТКЕРЛЕРГЕ АРНАЛҒАН",adminHeading:"Кітапханашы панелі",adminSub:"Кітапхана қорын басқарыңыз және жаңа кітаптарды каталогқа қосыңыз.",allBooksMetric:"Барлық кітап",availableMetric:"Қолжетімді",favoritesMetric:"Таңдаулыларда",addBook:"Жаңа кітап қосу",addBookSub:"Міндетті ақпаратты толтырыңыз.",bookName:"Кітап атауы",author:"Автор",genre:"Жанр",description:"Қысқаша сипаттама",shelf:"Сөре",copies:"Дана саны",saveBook:"Кітапты сақтау",adminDemoNote:"Демо нұсқада өзгерістер осы браузерде сақталады.",inventory:"Кітап қоры",inventorySub:"Каталогтағы соңғы жазбалар",footerText:"Оқуға жақынырақ болыңыз.",readerAccount:"ОҚЫРМАН АККАУНТЫ",welcome:"Қош келдіңіз!",authSub:"Профиль жасап, таңдаулы кітаптарыңызды сақтаңыз.",yourName:"Есіміңіз",email:"Электрондық пошта (міндетті емес)",createProfile:"Профиль жасау",localAccountNote:"Демо профиль осы құрылғыда ғана сақталады. Бұл нақты серверлік тіркеу емес.",details:"Толығырақ",availableLabel:"Қолжетімді",unavailableLabel:"Қолда жоқ",booksUnit:"кітап",added:"Кітап каталогқа қосылды!",profileSaved:"Профиль сақталды!",favAdded:"Таңдаулыларға қосылды",favRemoved:"Таңдаулылардан алынды",noResults:"Сұраныс бойынша кітап табылмады.",recommendationReason:"Сіздің қызығушылығыңызға сәйкес келуі мүмкін.",goalBased:"Сұранысыңызға сай",noDescription:"Сипаттама әлі қосылмаған.",shelfLabel:"Сөре",copiesLabel:"Дана",demoAiTitle:"Демо ұсыныс",loginPrompt:"Кітапханашы панелі демонстрация үшін ашық. Нақты жобада оған рұқсат қажет."
@@ -31,7 +75,36 @@ function coverHTML(book,small=false){const title=escapeHtml(book.title);return `
 function bookCard(book){const liked=favorites.includes(book.id);return `<article class="book-card">${coverHTML(book)}<button class="fav-button ${liked?"selected":""}" data-fav="${book.id}" aria-label="favorite">${liked?"♥":"♡"}</button><div class="book-info"><div class="book-genre">${escapeHtml(book.genre)}</div><h3>${escapeHtml(book.title)}</h3><p class="book-author">${escapeHtml(book.author)}</p><div class="book-bottom"><span class="availability ${book.copies>0?"":"out"}"><i></i>${book.copies>0?t("availableLabel"):t("unavailableLabel")}</span><button class="book-detail" data-detail="${book.id}">${t("details")} ↗</button></div></div></article>`}
 function renderBooks(){const search=($("#searchInput")?.value||"").trim().toLocaleLowerCase();const genre=$("#genreFilter")?.value||"all";const availability=$("#availabilityFilter")?.value||"all";let filtered=books.filter(b=>(`${b.title} ${b.author} ${b.genre} ${b.description}`.toLocaleLowerCase().includes(search))&&(genre==="all"||b.genre===genre)&&(availability==="all"||(availability==="yes"?b.copies>0:b.copies<=0)));$("#catalogBooks").innerHTML=filtered.map(bookCard).join("");$("#resultCount").textContent=`${filtered.length} ${t("booksUnit")}`;$("#featuredBooks").innerHTML=[...books].sort((a,b)=>b.copies-a.copies).slice(0,4).map(bookCard).join("");const favBooks=books.filter(b=>favorites.includes(b.id));$("#favoriteBooks").innerHTML=favBooks.map(bookCard).join("");$("#emptyFavorites").classList.toggle("show",favBooks.length===0);$("#favCount").textContent=favorites.length;$("#favoriteStat").textContent=favorites.length;$("#totalBooks").textContent=books.length;$("#availableBooks").textContent=books.filter(b=>b.copies>0).length;$("#adminTotal").textContent=books.length;$("#adminAvailable").textContent=books.filter(b=>b.copies>0).length;$("#adminFavs").textContent=favorites.length;$("#inventoryCount").textContent=books.length;$("#inventoryList").innerHTML=[...books].slice().reverse().map(b=>`<div class="inventory-row"><div class="inventory-cover cover-${(Number(b.cover)||1-1)%8+1}">${String(b.title).slice(0,1)}</div><div class="inventory-name"><strong>${escapeHtml(b.title)}</strong><small>${escapeHtml(b.author)} · ${escapeHtml(b.shelf||"—")}</small></div><span class="stock ${b.copies>0?"":"none"}">${b.copies} ${t("copiesLabel")}</span></div>`).join("")}
 function applyLanguage(){document.documentElement.lang=lang;$$("[data-i18n]").forEach(el=>{const val=t(el.dataset.i18n);if(val.includes("<br>")||val.includes("<em>"))el.innerHTML=val;else el.textContent=val});$$("[data-placeholder]").forEach(el=>el.placeholder=t(el.dataset.placeholder));$("#languageBtn").innerHTML=lang==="kk"?"ҚАЗ / РУС <span>↗</span>":"РУС / ҚАЗ <span>↗</span>";const active=$(".nav-item.active");if(active)$("#pageTitle").textContent=t(active.querySelector("[data-i18n]").dataset.i18n);$("#sideUser").textContent=profile?.name|| (lang==="kk"?"Оқырман":"Читатель");$("#topUser").textContent=profile?.name|| (lang==="kk"?"Оқырман":"Читатель");$("#sideAvatar").textContent=(profile?.name||"О").slice(0,1).toUpperCase();$("#topAvatar").textContent=(profile?.name||"О").slice(0,1).toUpperCase();renderBooks();if($("#recommendationList").dataset.generated==="true")generateRecommendations()}
-function navigate(page){$$(".page").forEach(p=>p.classList.remove("active"));$(`#${page}Page`)?.classList.add("active");$$(".nav-item").forEach(b=>b.classList.toggle("active",b.dataset.page===page));const btn=$(`.nav-item[data-page="${page}"]`);$("#pageTitle").textContent=btn?t(btn.querySelector("[data-i18n]").dataset.i18n):"";window.scrollTo({top:0,behavior:"smooth"});if(page==="catalog")renderBooks()}
+async function navigate(page) {
+    if (page === "admin") {
+        await refreshAuthState();
+
+        if (!isLibrarian) {
+            toast("Доступ разрешён только библиотекарю");
+            await openAuth();
+            return;
+        }
+    }
+
+    $$(".page").forEach(p => p.classList.remove("active"));
+    $(`#${page}Page`)?.classList.add("active");
+
+    $$(".nav-item").forEach(b =>
+        b.classList.toggle("active", b.dataset.page === page)
+    );
+
+    const btn = $(`.nav-item[data-page="${page}"]`);
+
+    $("#pageTitle").textContent = btn
+        ? t(btn.querySelector("[data-i18n]").dataset.i18n)
+        : "";
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+
+    if (page === "catalog") {
+        renderBooks();
+    }
+}
 function toast(message){const el=$("#toast");el.textContent=message;el.classList.add("show");clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.remove("show"),2600)}
 function toggleFavorite(id){id=Number(id);if(favorites.includes(id)){favorites=favorites.filter(x=>x!==id);toast(t("favRemoved"))}else{favorites.push(id);toast(t("favAdded"))}save();renderBooks()}
 function showDetails(id){const b=books.find(x=>x.id===Number(id));if(!b)return;alert(`${b.title}\n${b.author}\n${b.genre}\n\n${b.description||t("noDescription")}\n\n${t("shelfLabel")}: ${b.shelf||"—"}\n${t("copiesLabel")}: ${b.copies}`)}
@@ -43,9 +116,109 @@ $("#searchInput").addEventListener("input",renderBooks);$("#genreFilter").addEve
 $("#interestChips").addEventListener("click",e=>{const chip=e.target.closest(".chip");if(chip)chip.classList.toggle("selected")});
 $("#recommendBtn").addEventListener("click",generateRecommendations);
 $("#languageBtn").addEventListener("click",()=>{lang=lang==="kk"?"ru":"kk";save();applyLanguage()});
-function openAuth(){$("#authModal").hidden=false;$("#readerName").value=profile?.name||"";$("#readerEmail").value=profile?.email||""}
+async function openAuth() {
+    await refreshAuthState();
+
+    const form = $("#authForm");
+    const logoutButton = $("#logoutBtn");
+    const message = $("#authMessage");
+
+    $("#authModal").hidden = false;
+    message.textContent = "";
+
+    if (currentUser) {
+        form.hidden = true;
+        logoutButton.hidden = false;
+        message.textContent = "Вы вошли как: " + currentUser.email;
+    } else {
+        form.hidden = false;
+        logoutButton.hidden = true;
+        $("#readerEmail").value = "";
+        $("#readerPassword").value = "";
+    }
+}
 $("#openAuth").addEventListener("click",openAuth);$("#topAuth").addEventListener("click",openAuth);$("#closeAuth").addEventListener("click",()=>$("#authModal").hidden=true);$("#authModal").addEventListener("click",e=>{if(e.target.id==="authModal")$("#authModal").hidden=true});
-$("#authForm").addEventListener("submit",e=>{e.preventDefault();profile={name:$("#readerName").value.trim(),email:$("#readerEmail").value.trim()};save();applyLanguage();$("#authModal").hidden=true;toast(t("profileSaved"))});
+$("#authForm").addEventListener("submit", async e => {
+    e.preventDefault();
+
+    const email = $("#readerEmail").value.trim();
+    const password = $("#readerPassword").value;
+
+    const message = $("#authMessage");
+    message.textContent = "Выполняется вход...";
+
+    const { data, error } =
+        await supabaseClient.auth.signInWithPassword({
+            email,
+            password
+        });
+
+    if (error) {
+        message.textContent = "Ошибка входа: " + error.message;
+        return;
+    }
+
+    await refreshAuthState();
+
+    profile = {
+        name: data.user.email,
+        email: data.user.email
+    };
+
+    save();
+    applyLanguage();
+
+    $("#authModal").hidden = true;
+    message.textContent = "";
+
+    toast("Вы успешно вошли в аккаунт");
+});
+$("#logoutBtn").addEventListener("click", async () => {
+    const { error } = await supabaseClient.auth.signOut();
+
+    if (error) {
+        $("#authMessage").textContent = "Ошибка выхода: " + error.message;
+        return;
+    }
+
+    currentUser = null;
+    isLibrarian = false;
+    profile = null;
+
+    save();
+    await refreshAuthState();
+
+    $("#authModal").hidden = true;
+    toast("Вы вышли из аккаунта");
+});
 $("#bookForm").addEventListener("submit",e=>{e.preventDefault();const title=$("#bookTitle").value.trim(),author=$("#bookAuthor").value.trim();if(!title||!author)return;books.push({id:nextId++,title,author,genre:$("#bookGenre").value,description:$("#bookDescription").value.trim(),shelf:$("#bookShelf").value.trim()||"—",copies:Math.max(0,Number($("#bookCopies").value)||0),cover:(books.length%8)+1});save();renderBooks();e.target.reset();$("#bookCopies").value=1;toast(t("added"))});
 document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="k"){e.preventDefault();navigate("catalog");$("#searchInput").focus()}if(e.key==="Escape")$("#authModal").hidden=true});
+
+async function loadBooksFromServer() {
+    console.log("Supabase кітаптарды жүктеуді бастады");
+    const { data, error } = await supabaseClient
+    .from("books")
+    .select("*")
+    .order("id", { ascending: true });
+
+if (error) {
+  console.error("Ошибка загрузки книг:", error.message);
+  toast("Не удалось загрузить книги с сервера");
+  return;
+}
+  books = data.map(book => ({
+    id: book.id,
+    title: book.title,
+    author: book.author,
+    genre: book.genre,
+    description: book.description || "",
+    shelf: book.shelf || "",
+    copies: book.available_copies,
+    cover: 1
+  }));
+
+  renderBooks();
+}
 applyLanguage();
+refreshAuthState();
+loadBooksFromServer();
