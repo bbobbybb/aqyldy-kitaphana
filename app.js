@@ -17,6 +17,7 @@ const supabaseClient = window.supabase.createClient(
 );
 let currentUser = null;
 let isLibrarian = false;
+let isPasswordRecovery = false;
 
 async function refreshAuthState() {
     const { data, error } = await supabaseClient.auth.getSession();
@@ -25,7 +26,6 @@ async function refreshAuthState() {
         console.error("Ошибка проверки входа:", error.message);
         return;
     }
-let isPasswordRecovery = false;
 
 supabaseClient.auth.onAuthStateChange((event, session) => {
     if (event === "PASSWORD_RECOVERY") {
