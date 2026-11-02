@@ -55,6 +55,8 @@ supabaseClient.auth.onAuthStateChange((event, session) => {
             console.error("Ошибка проверки роли:", profileError.message);
         } else {
             isLibrarian = userProfile?.role === "librarian";
+            console.log("Профиль библиотекаря:", userProfile);
+console.log("Права библиотекаря:", isLibrarian);
         }
     }
 
