@@ -25,7 +25,21 @@ async function refreshAuthState() {
         console.error("Ошибка проверки входа:", error.message);
         return;
     }
+let isPasswordRecovery = false;
 
+supabaseClient.auth.onAuthStateChange((event, session) => {
+    if (event === "PASSWORD_RECOVERY") {
+        isPasswordRecovery = true;
+
+        $("#authModal").hidden = false;
+        $("#authForm").hidden = true;
+        $("#resetPasswordForm").hidden = false;
+        $("#logoutBtn").hidden = true;
+
+        $("#authMessage").textContent =
+            "Введите и подтвердите новый пароль";
+    }
+});
     currentUser = data.session?.user || null;
     isLibrarian = false;
 
@@ -118,6 +132,13 @@ $("#recommendBtn").addEventListener("click",generateRecommendations);
 $("#languageBtn").addEventListener("click",()=>{lang=lang==="kk"?"ru":"kk";save();applyLanguage()});
 async function openAuth() {
     await refreshAuthState();
+    if (isPasswordRecovery) {
+    $("#authModal").hidden = false;
+    $("#authForm").hidden = true;
+    $("#resetPasswordForm").hidden = false;
+    $("#logoutBtn").hidden = true;
+    return;
+}
 
     const form = $("#authForm");
     const logoutButton = $("#logoutBtn");
@@ -152,6 +173,76 @@ $("#authForm").addEventListener("submit", async e => {
             email,
             password
         });
+$("#showRegister").addEventListener("click", async () => {
+    const email = $("#readerEmail").value.trim();
+    const password = $("#readerPassword").value;
+    const message = $("#authMessage");
+
+    if (!email || !password) {
+        message.textContent = "Введите email и пароль для регистрации";
+        return;
+    }
+
+    if (password.length < 6) {
+        message.textContent = "Пароль должен содержать минимум 6 символов";
+        return;
+    }
+
+    message.textContent = "Создаём аккаунт...";
+
+    const { data, error } = await supabaseClient.auth.signUp({
+        email: email,
+        password: password
+    });
+
+    $("#resetPasswordForm").addEventListener("submit", async e => {
+    e.preventDefault();
+
+    const password = $("#newPassword").value;
+    const confirmPassword = $("#confirmPassword").value;
+    const message = $("#authMessage");
+
+    if (password.length < 6) {
+        message.textContent = "Пароль должен содержать минимум 6 символов";
+        return;
+    }
+
+    if (password !== confirmPassword) {
+        message.textContent = "Пароли не совпадают";
+        return;
+    }
+
+    message.textContent = "Сохраняем новый пароль...";
+
+    const { error } = await supabaseClient.auth.updateUser({
+        password: password
+    });
+
+    if (error) {
+        message.textContent = "Ошибка: " + error.message;
+        return;
+    }
+
+    message.textContent = "Пароль успешно изменён!";
+    $("#resetPasswordForm").hidden = true;
+    $("#authForm").hidden = false;
+    $("#logoutBtn").hidden = false;
+});
+
+    if (error) {
+        message.textContent = "Ошибка регистрации: " + error.message;
+        return;
+    }
+
+    if (data.session) {
+        await refreshAuthState();
+        $("#authModal").hidden = true;
+        toast("Аккаунт успешно создан!");
+    } else {
+        message.textContent =
+            "Аккаунт создан! Проверьте почту и подтвердите регистрацию.";
+    }
+});
 
     if (error) {
         message.textContent = "Ошибка входа: " + error.message;

@@ -150,7 +150,47 @@
       <button class="button button-green full-button" type="submit">
         Войти
       </button>
-    </form>
+
+      <button
+    type="button"
+    id="showRegister"
+    class="button full-button"
+>
+    Регистрация
+</button>
+</form>
+<form id="resetPasswordForm" hidden>
+    <label class="field-label" for="newPassword">
+        Новый пароль
+    </label>
+
+    <input
+        id="newPassword"
+        type="password"
+        minlength="6"
+        required
+        placeholder="Введите новый пароль"
+    >
+
+    <label class="field-label" for="confirmPassword">
+        Повторите пароль
+    </label>
+
+    <input
+        id="confirmPassword"
+        type="password"
+        minlength="6"
+        required
+        placeholder="Повторите новый пароль"
+    >
+
+    <button
+        class="button button-green full-button"
+        type="submit"
+    >
+        Сохранить новый пароль
+    </button>
+</form>
 
     <button id="logoutBtn" class="button button-green full-button" hidden>
       Выйти
